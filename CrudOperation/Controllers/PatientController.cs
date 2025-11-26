@@ -3,6 +3,7 @@ using CrudOperation.Repository;
 using CrudOperation.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace CrudOperation.Controllers
 {
@@ -29,70 +30,78 @@ namespace CrudOperation.Controllers
             return View(patients);
 
         }
-
-        [HttpGet]
+        [HttpGet] 
         public async Task<IActionResult> Create()
-        {
-            ViewBag.Doctors = await _doctorRepo.GetAll();
+        { 
+            ViewBag.Doctors = await _doctorRepo.GetAll(); 
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(PatientCreateViewModel model)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                ViewBag.Doctors = await _doctorRepo.GetAll();
-                return View(model);
-            }
-
-            // ✅ Image Upload
-            string fileName = "";
-
-            if (model.Picture != null)
-            {
-                string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Pictures");
-
-                if (!Directory.Exists(path))
-                    Directory.CreateDirectory(path);
-
-                fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Picture.FileName);
-
-                string filePath = Path.Combine(path, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                string fileName = "";
+                if (model.Picture != null)
                 {
-                    await model.Picture.CopyToAsync(stream);
+                    string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Pictures");
+                    if (!Directory.Exists(path))
+                        Directory.CreateDirectory(path);
+
+                    fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Picture.FileName);
+                    string filePath = Path.Combine(path, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await model.Picture.CopyToAsync(stream);
+                    }
                 }
-            }
 
-            // ✅ Save Patient
-            Patient patient = new Patient
-            {
-                Name = model.Name,
-                Age = model.Age,
-                Phone = model.Phone,
-                Address = model.Address,
-                DateOfBirth = model.DateOfBirth,
-                Picture = fileName
-            };
-
-            await _patientRepo.AddAsync(patient);   
-
-            foreach (var appointmentModel in model.Appointments)
-            {
-                Appointment appointment = new Appointment
+                // ✅ Save Patient (Master)
+                Patient patient = new Patient
                 {
-                    DoctorId = appointmentModel.DoctorId,
-                    AppointmentDate = appointmentModel.AppointmentDate,
-                    Reason = appointmentModel.Reason
+                    Name = model.Name,
+                    Age = model.Age,
+                    Phone = model.Phone,
+                    Address = model.Address,
+                    DateOfBirth = model.DateOfBirth,
+                    Picture = fileName
                 };
 
-                await _appointmentRepo.AddAsync(appointment); 
-            }
+                // Save Patient first to get Id
+                await _patientRepo.AddAsync(patient);
+                // await _patientRepo.SaveAsync(); // Ensure patient.Id is generated
 
-            return RedirectToAction("Index");
+                // Save Appointments (Details)
+                foreach (var appointmentModel in model.Appointments)
+                {
+                    Appointment appointment = new Appointment
+                    {
+                        DoctorId = appointmentModel.DoctorId,
+                        AppointmentDate = appointmentModel.AppointmentDate,
+                        Reason = appointmentModel.Reason,
+                        PatientId = patient.Id // Link to master
+                    };
+
+                    await _appointmentRepo.AddAsync(appointment);
+                }
+
+                // await _appointmentRepo.SaveAsync(); // Save all appointments
+
+                return RedirectToAction("Index");
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            
+           
         }
+       
+
+
 
 
     }

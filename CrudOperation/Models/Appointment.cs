@@ -6,17 +6,17 @@ namespace CrudOperation.Models
     {
         public long Id { get; set; }
         public DateTime AppointmentDate { get; set; }
-        public string Reason { get; set; } = null!;
+        public string? Reason { get; set; } = null!;
 
         // Foreign Keys
         [ForeignKey("Doctor")]
-        public long DoctorId { get; set; }
+        public long? DoctorId { get; set; }
         [ForeignKey("Patient")]
-        public long PatientId { get; set; }
+        public long? PatientId { get; set; }
 
         // Navigation properties
-        public virtual Doctor Doctor { get; set; } = null!;
-        public virtual Patient Patient { get; set; } = null!;
+        public virtual Doctor? Doctor { get; set; }
+        public virtual Patient? Patient { get; set; }
     }
 
 }
