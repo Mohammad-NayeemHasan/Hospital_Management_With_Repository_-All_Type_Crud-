@@ -2,14 +2,11 @@
 @{
     ViewData["Title"] = "Index";
 }
-@model IEnumerable<Patient>
-
-@{
-    ViewData["Title"] = "Patient List";
-}
 
 <h2>Patient List</h2>
-
+<div class="d-flex justify-content-end">
+<a class="btn btn-success mb-3 d-flex justify-content-end" href="@Url.Action("Create", "Patient")">Create New Patient</a>
+</div>
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
@@ -33,7 +30,10 @@
                 <td>
                     @if (!string.IsNullOrEmpty(p.Picture))
                     {
-                        <img src="@Url.Content(p.Picture)" width="60" height="60" style="border-radius:5px;" />
+                        @* <img src="@Url.Content(p.Picture)" width="60" height="60" style="border-radius:5px;" /> *@
+                    
+                        <img src="~/Pictures/@p.Picture" alt="@p.Name" class="img-thumbnail rounded-circle" style="height:50px" />
+                   
                     }
                     else
                     {
@@ -68,6 +68,7 @@
                         <span>No Doctor</span>
                     }
                 </td>
+               
 
                 <!-- Actions -->
                 <td>

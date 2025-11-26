@@ -1,95 +1,54 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CrudOperation.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 
 namespace CrudOperation.Repository
 {
-
     public class Repository<T> : IRepository<T> where T : class
     {
-        private readonly DbContext _context;
-        private readonly DbSet<T> _dbSet;
+        private readonly ApplicationDbContext _context;
 
-        public Repository(DbContext context)
+        public Repository(ApplicationDbContext context)
         {
             _context = context;
-            _dbSet = context.Set<T>();
         }
 
-        // -----------------------
-        // Get All With Include
-        // -----------------------
-        public async Task<IEnumerable<T>> GetAll(
-            Func<IQueryable<T>, IIncludableQueryable<T, object>>? includes)
+        // GetAll with optional Include
+        public async Task<List<T>> GetAll(Func<IQueryable<T>, IIncludableQueryable<T, object>>? includes = null)
         {
-            IQueryable<T> query = _dbSet.AsQueryable();
+            IQueryable<T> query = _context.Set<T>();
 
             if (includes != null)
-            {
                 query = includes(query);
-            }
 
             return await query.ToListAsync();
         }
 
-        // -----------------------
-        // Get by Id
-        // -----------------------
-        public async Task<T?> Get(long id)
+        public async Task<T?> GetById(long id)
         {
-            return await _dbSet.FindAsync(id);
+            return await _context.Set<T>().FindAsync(id);
         }
 
-        // -----------------------
-        // Insert
-        // -----------------------
-        public async Task<T?> Insert(T entity)
+        public async Task AddAsync(T entity)
         {
-            await _dbSet.AddAsync(entity);
-            return entity;
-        }
-
-        // -----------------------
-        // Update
-        // -----------------------
-        public async Task<T?> Update(T entity)
-        {
-            _dbSet.Update(entity);
-            return await Task.FromResult(entity);
-        }
-
-        // -----------------------
-        // Delete using Find
-        // -----------------------
-        public async Task Delete(long id)
-        {
-            var entity = await _dbSet.FindAsync(id);
-            if (entity != null)
-            {
-                _dbSet.Remove(entity);
-            }
-        }
-
-        // -----------------------
-        // Remove and return success/fail
-        // -----------------------
-        public async Task<bool> Remove(long id)
-        {
-            var entity = await _dbSet.FindAsync(id);
-
-            if (entity == null)
-                return false;
-
-            _dbSet.Remove(entity);
-            return true;
-        }
-
-        // -----------------------
-        // Save changes
-        // -----------------------
-        public async Task SaveChanges()
-        {
+            await _context.Set<T>().AddAsync(entity);
             await _context.SaveChangesAsync();
         }
-    }
 
+        public async Task UpdateAsync(T entity)
+        {
+            _context.Set<T>().Update(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(long id)
+        {
+            var data = await _context.Set<T>().FindAsync(id);
+            if (data != null)
+            {
+                _context.Set<T>().Remove(data);
+                await _context.SaveChangesAsync();
+            }
+        }
+    }
 }

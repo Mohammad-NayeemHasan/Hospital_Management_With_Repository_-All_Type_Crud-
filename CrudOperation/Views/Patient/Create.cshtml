@@ -1,0 +1,69 @@
+﻿@using CrudOperation.ViewModels
+@model PatientCreateViewModel
+@{
+    ViewData["Title"] = "Create Patient";
+}
+
+<h2>Create Patient</h2>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+
+    <div class="form-group mb-2">
+        <label>Name</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+
+    <div class="form-group mb-2">
+        <label>Age</label>
+        <input asp-for="Age" type="number" class="form-control" />
+    </div>
+
+    <div class="form-group mb-2">
+        <label>Phone</label>
+        <input asp-for="Phone" class="form-control" />
+    </div>
+
+    <div class="form-group mb-2">
+        <label>Date of Birth</label>
+        <input asp-for="DateOfBirth" type="date" class="form-control" />
+    </div>
+
+    <div class="form-group mb-2">
+        <label>Address</label>
+        <textarea asp-for="Address" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group mb-2">
+        <label>Picture</label>
+        <input asp-for="Picture" type="file" class="form-control" />
+    </div>
+
+    <hr />
+
+    <h4>Appointment Info</h4>
+
+    <div class="form-group mb-2">
+        <label>Select Doctor</label>
+        <select asp-for="Appointments[0].DoctorId"
+                class="form-control"
+                asp-items="@(new SelectList(ViewBag.Doctors, "Id", "Name"))">
+            <option value="">-- Select Doctor --</option>
+        </select>
+    </div>
+
+    <div class="form-group mb-2">
+        <label>Appointment Date</label>
+        <input asp-for="Appointments[0].AppointmentDate" type="datetime-local" class="form-control" />
+    </div>
+
+    <div class="form-group mb-2">
+        <label>Reason</label>
+        <input asp-for="Appointments[0].Reason" class="form-control" />
+    </div>
+
+    <br />
+
+    <button type="submit" class="btn btn-success">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+
+</form>

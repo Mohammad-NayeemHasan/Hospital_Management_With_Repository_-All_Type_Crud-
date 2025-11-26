@@ -1,7 +1,22 @@
+using CrudOperation.Data;
+using CrudOperation.Models;
+using CrudOperation.Repository;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<ApplicationDbContext>(op =>
+{
+    op.UseSqlServer(builder.Configuration.GetConnectionString("Con"));
+});
+//builder.Services.AddScoped(typeof(IRepository<Patient>), typeof(Repository<Patient>));
+//builder.Services.AddScoped(typeof(IRepository<Appointment>), typeof(Repository<Appointment>));
+//builder.Services.AddScoped(typeof(IRepository<Doctor>), typeof(Repository<Doctor>));
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+
 
 var app = builder.Build();
 

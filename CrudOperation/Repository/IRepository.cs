@@ -4,12 +4,19 @@ namespace CrudOperation.Repository
 {
     public interface IRepository<T> where T : class
     {
-        Task<IEnumerable<T>> GetAll(Func<IQueryable<T>, IIncludableQueryable<T, object>>? includes);
-        Task<T?> Get(long id);
-        Task<T?> Insert(T entity);
-        Task<T?> Update(T entity);
-        Task Delete(long id);
-        Task<bool> Remove(long id);
-        Task SaveChanges();
+        // Get all records with optional Include
+        Task<List<T>> GetAll(Func<IQueryable<T>, IIncludableQueryable<T, object>>? includes = null);
+
+        // Get by Id
+        Task<T?> GetById(long id);
+
+        // Add
+        Task AddAsync(T entity);
+
+        // Update
+        Task UpdateAsync(T entity);
+
+        // Delete
+        Task DeleteAsync(long id);
     }
 }
