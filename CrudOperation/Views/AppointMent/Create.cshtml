@@ -1,0 +1,33 @@
+﻿@model Appointment
+@{
+    ViewData["Title"] = "Create";
+}
+
+<form method="post">
+    <div class="form-group mb-2">
+        <label>Appointment Date</label>
+        <input asp-for="AppointmentDate" type="datetime-local" class="form-control" />
+        <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label>Reason</label>
+        <input asp-for="Reason" class="form-control" />
+        <span asp-validation-for="Reason" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label>Select Doctor</label>
+        <select asp-for="DoctorId" class="form-control" asp-items="ViewBag.Doctors">
+            <option value="">-- Select Doctor --</option>
+        </select>
+        <span asp-validation-for="DoctorId" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label>Select Patient</label>
+        <select asp-for="PatientId" class="form-control" asp-items="ViewBag.Patients">
+            <option value="">-- Select Patient --</option>
+        </select>
+        <span asp-validation-for="PatientId" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
